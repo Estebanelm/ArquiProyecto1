@@ -30,7 +30,29 @@ public class PipelineCompiler {
         return dato;
     }
     
-    private static String addNops(int[] array, int registroAfectado1, int registroAfectado2)
+    private static Map<String, Integer> modificarTags(Map<String, Integer> tags, int lineaActual, int numNops)
+    {
+        for (String key : tags.keySet()) {
+            if (tags.get(key) > lineaActual)
+            {
+                tags.replace(key, tags.get(key) + numNops);
+        
+            }
+        }
+        return tags;
+    }
+    
+    private static String agregarNops(int cantidadNops)
+    {
+        String stringConNops = "";
+        for (int i = 0; i < cantidadNops; i++) 
+        {
+            stringConNops = stringConNops.concat("0000000000000000000\n");
+        }
+        return stringConNops;
+    }
+    
+    private static int contarNops(int[] array, int registroAfectado1, int registroAfectado2)
     {
         String stringConNops1 = "";
         String stringConNops2 = "";
@@ -38,7 +60,6 @@ public class PipelineCompiler {
         int contador2 = 0;
         while(true)
         {
-            stringConNops1 = stringConNops1.concat("0000000000000000000\n");
             if (array[contador1] == registroAfectado1)
             {
                 break;
@@ -46,14 +67,13 @@ public class PipelineCompiler {
             if (contador1 == array.length - 1)
             {
                 stringConNops1 = "";
-                contador1 = 0;
+                contador1 = -1;
                 break;
             }
             contador1++;
         }
         while(true)
         {
-            stringConNops2 = stringConNops2.concat("0000000000000000000\n");
             if (array[contador2] == registroAfectado2)
             {
                 break;
@@ -61,18 +81,18 @@ public class PipelineCompiler {
             if (contador2 == array.length - 1)
             {
                 stringConNops2 = "";
-                contador2 = 0;
+                contador2 = -1;
                 break;
             }
             contador2++;
         }
         if (contador1>contador2)
         {
-            return stringConNops1;
+            return contador1+1;
         }
         else
         {
-            return stringConNops2;
+            return contador2+1;
         }
     }
 
@@ -96,8 +116,10 @@ public class PipelineCompiler {
         FileWriter codedFile = new FileWriter(codeString);
         BufferedReader br1 = new BufferedReader(file);
         String line = null;
-        Map<String, Integer> tags = new HashMap<String, Integer>();
+        Map<String, Integer> tags = new HashMap<>();
         int contadorTags = 0;
+        int contadorLineas = 0;
+        int totalTags = 0;
         while ((line = br1.readLine()) != null)
         {
             String pattern = "[a-zA-Z]+:";
@@ -105,7 +127,8 @@ public class PipelineCompiler {
             Matcher m = r.matcher(line);
             if (m.find())
             {
-                tags.put(line.split(":")[0], contadorTags);
+                tags.put(line.split(":")[0], contadorTags - totalTags);
+                totalTags++;
             }
             contadorTags++;
         }
@@ -123,8 +146,9 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
-               codedInstruction = addNops(arrayNops, int2, int3);
-               if (codedInstruction == "")
+               int cantidadNops = contarNops(arrayNops, int2, int3);
+               codedInstruction = agregarNops(cantidadNops);
+               if ("".equals(codedInstruction))
                {
                    arrayNops = shiftArray(arrayNops, int1);
                }
@@ -135,7 +159,11 @@ public class PipelineCompiler {
                }
                codedInstruction = codedInstruction.concat("1000").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
                codedFile.write(codedInstruction);
-               
+               if (cantidadNops != 0)
+               {
+                    contadorLineas = contadorLineas + cantidadNops;
+                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+               }
             }
             if (instruction[0].equals("add"))
             {
@@ -145,8 +173,9 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
-               codedInstruction = addNops(arrayNops, int2, int3);
-               if (codedInstruction == "")
+               int cantidadNops = contarNops(arrayNops, int2, int3);
+               codedInstruction = agregarNops(cantidadNops);
+               if ("".equals(codedInstruction))
                {
                    arrayNops = shiftArray(arrayNops, int1);
                }
@@ -157,6 +186,11 @@ public class PipelineCompiler {
                }
                codedInstruction = codedInstruction.concat("0001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
                codedFile.write(codedInstruction);
+               if (cantidadNops != 0)
+               {
+                    contadorLineas = contadorLineas + cantidadNops;
+                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+               }
             }
             if (instruction[0].equals("sub"))
             {
@@ -166,8 +200,9 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
-               codedInstruction = addNops(arrayNops, int2, int3);
-               if (codedInstruction == "")
+               int cantidadNops = contarNops(arrayNops, int2, int3);
+               codedInstruction = agregarNops(cantidadNops);
+               if ("".equals(codedInstruction))
                {
                    arrayNops = shiftArray(arrayNops, int1);
                }
@@ -178,6 +213,11 @@ public class PipelineCompiler {
                }
                codedInstruction = codedInstruction.concat("0010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
                codedFile.write(codedInstruction);
+               if (cantidadNops != 0)
+               {
+                    contadorLineas = contadorLineas + cantidadNops;
+                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+               }
             }
             if (instruction[0].equals("mul"))
             {
@@ -187,8 +227,9 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
-               codedInstruction = addNops(arrayNops, int2, int3);
-               if (codedInstruction == "")
+               int cantidadNops = contarNops(arrayNops, int2, int3);
+               codedInstruction = agregarNops(cantidadNops);
+               if ("".equals(codedInstruction))
                {
                    arrayNops = shiftArray(arrayNops, int1);
                }
@@ -199,6 +240,11 @@ public class PipelineCompiler {
                }
                codedInstruction = codedInstruction.concat("0011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
                codedFile.write(codedInstruction);
+               if (cantidadNops != 0)
+               {
+                    contadorLineas = contadorLineas + cantidadNops;
+                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+               }
             }
             if (instruction[0].equals("bne"))
             {
@@ -207,11 +253,12 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),7);
-               codedInstruction = addNops(arrayNops, int1, int2);
                codedInstruction = codedInstruction.concat("0100").concat(dato1).concat(dato2).concat(dato3).concat("\n");
                codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
                codedFile.write(codedInstruction);
                arrayNops = new int[]{17,17,17};
+               contadorLineas = contadorLineas + 3;
+               tags = modificarTags(tags, contadorLineas, 3);
             }
             if (instruction[0].equals("addi"))
             {
@@ -221,8 +268,9 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
-               codedInstruction = addNops(arrayNops, int2, 16);
-               if (codedInstruction == "")
+               int cantidadNops = contarNops(arrayNops, int2, 16);
+               codedInstruction = agregarNops(cantidadNops);
+               if ("".equals(codedInstruction))
                {
                    arrayNops = shiftArray(arrayNops, int1);
                }
@@ -233,7 +281,14 @@ public class PipelineCompiler {
                }
                codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
                codedFile.write(codedInstruction);
+               if (cantidadNops != 0)
+               {
+                    contadorLineas = contadorLineas + cantidadNops;
+                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+               }
             }
+            
+            contadorLineas++;
         }
         codedFile.close();
    } 
