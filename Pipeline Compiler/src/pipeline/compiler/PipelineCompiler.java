@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import javafx.util.Pair;
 /**
  *
  * @author Pelo
@@ -106,6 +107,121 @@ public class PipelineCompiler {
         return array;
     }
 
+    private static Pair<Integer, int[]> buscarNops(String line, int[] array)
+    {
+        String[] instruction = line.split(" ");
+        int cantidadNops = 0;
+        if (instruction[0].equals("lb"))
+        {
+            int int1 = Integer.parseInt(instruction[1]);
+            int int2 = Integer.parseInt(instruction[2]);
+            int int3 = Integer.parseInt(instruction[3]);
+            cantidadNops = contarNops(array, int2, int3);
+            if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("li"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("add"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, int3);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("sub"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, int3);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("mul"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, int3);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("bne"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           cantidadNops = contarNops(array, int1, int2);
+           cantidadNops += 3;
+           array = new int[]{17,17,17};
+        }
+        if (instruction[0].equals("beqz"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           cantidadNops = contarNops(array, int1, 16);
+           cantidadNops += 3;
+           array = new int[]{17,17,17};
+        }
+        if (instruction[0].equals("j"))
+        {
+            array = shiftArray(array, 17);
+        }
+        if (instruction[0].equals("addi"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, 16);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("sll"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, 16);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        if (instruction[0].equals("div"))
+        {
+           int int1 = Integer.parseInt(instruction[1]);
+           int int2 = Integer.parseInt(instruction[2]);
+           int int3 = Integer.parseInt(instruction[3]);
+           cantidadNops = contarNops(array, int2, 16);
+           if (cantidadNops != 0)
+            {
+                array = new int[]{17,17,17};
+            }
+            array = shiftArray(array, int1);
+        }
+        return new Pair<>(cantidadNops, array);
+    }
+    
     public static void main( String args[] ) throws IOException {
 
         int[] arrayNops = new int[]{17,17,17};
@@ -118,8 +234,9 @@ public class PipelineCompiler {
         String line = null;
         Map<String, Integer> tags = new HashMap<>();
         int contadorTags = 0;
-        int contadorLineas = 0;
         int totalTags = 0;
+        int contadorNopsCicloTags = 0;
+        int[] arrayCiclo1 = new int[]{17,17,17};
         while ((line = br1.readLine()) != null)
         {
             String pattern = "[a-zA-Z]+:";
@@ -128,9 +245,16 @@ public class PipelineCompiler {
             if (m.find())
             {
                 tags.put(line.split(":")[0], contadorTags - totalTags);
+                contadorNopsCicloTags = 0;
                 totalTags++;
             }
-            contadorTags++;
+            else
+            {
+                Pair<Integer, int[]> nopsArray =  buscarNops(line, arrayCiclo1);
+                contadorNopsCicloTags = nopsArray.getKey();
+                arrayCiclo1 = nopsArray.getValue();
+            }
+            contadorTags = contadorTags + contadorNopsCicloTags + 1;
         }
         br1.close();
         BufferedReader br2 = new BufferedReader(new FileReader(fileString));
@@ -148,22 +272,23 @@ public class PipelineCompiler {
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
                int cantidadNops = contarNops(arrayNops, int2, int3);
                codedInstruction = agregarNops(cantidadNops);
-               if ("".equals(codedInstruction))
-               {
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               else
-               {
-                   arrayNops = new int[]{17,17,17};
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               codedInstruction = codedInstruction.concat("1000").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
-               codedFile.write(codedInstruction);
                if (cantidadNops != 0)
                {
-                    contadorLineas = contadorLineas + cantidadNops;
-                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+                   arrayNops = new int[]{17,17,17};
                }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("1000").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
+            }
+            if (instruction[0].equals("li"))
+            {
+               int int1 = Integer.parseInt(instruction[1]);
+               int int2 = Integer.parseInt(instruction[2]);
+               String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
+               String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("0101").concat(dato1).concat(dato2).concat("0000000\n");
+               codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("add"))
             {
@@ -175,22 +300,13 @@ public class PipelineCompiler {
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
                int cantidadNops = contarNops(arrayNops, int2, int3);
                codedInstruction = agregarNops(cantidadNops);
-               if ("".equals(codedInstruction))
-               {
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               else
-               {
-                   arrayNops = new int[]{17,17,17};
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               codedInstruction = codedInstruction.concat("0001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
-               codedFile.write(codedInstruction);
                if (cantidadNops != 0)
                {
-                    contadorLineas = contadorLineas + cantidadNops;
-                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+                   arrayNops = new int[]{17,17,17};
                }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("0001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("sub"))
             {
@@ -202,22 +318,13 @@ public class PipelineCompiler {
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
                int cantidadNops = contarNops(arrayNops, int2, int3);
                codedInstruction = agregarNops(cantidadNops);
-               if ("".equals(codedInstruction))
-               {
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               else
-               {
-                   arrayNops = new int[]{17,17,17};
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               codedInstruction = codedInstruction.concat("0010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
-               codedFile.write(codedInstruction);
                if (cantidadNops != 0)
                {
-                    contadorLineas = contadorLineas + cantidadNops;
-                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+                   arrayNops = new int[]{17,17,17};
                }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("0010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("mul"))
             {
@@ -229,36 +336,46 @@ public class PipelineCompiler {
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
                int cantidadNops = contarNops(arrayNops, int2, int3);
                codedInstruction = agregarNops(cantidadNops);
-               if ("".equals(codedInstruction))
-               {
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               else
-               {
-                   arrayNops = new int[]{17,17,17};
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               codedInstruction = codedInstruction.concat("0011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
-               codedFile.write(codedInstruction);
                if (cantidadNops != 0)
                {
-                    contadorLineas = contadorLineas + cantidadNops;
-                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+                   arrayNops = new int[]{17,17,17};
                }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("0011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("bne"))
             {
                int int1 = Integer.parseInt(instruction[1]);
                int int2 = Integer.parseInt(instruction[2]);
+               int cantidadNops = contarNops(arrayNops, int1, int2);
+               codedInstruction = agregarNops(cantidadNops);
+               arrayNops = new int[]{17,17,17};
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),7);
                codedInstruction = codedInstruction.concat("0100").concat(dato1).concat(dato2).concat(dato3).concat("\n");
                codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
                codedFile.write(codedInstruction);
+            }
+            if (instruction[0].equals("beqz"))
+            {
+               int int1 = Integer.parseInt(instruction[1]);
+               int cantidadNops = contarNops(arrayNops, int1, 16);
+               codedInstruction = agregarNops(cantidadNops);
                arrayNops = new int[]{17,17,17};
-               contadorLineas = contadorLineas + 3;
-               tags = modificarTags(tags, contadorLineas, 3);
+               String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
+               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[2])),7);
+               codedInstruction = codedInstruction.concat("0110").concat(dato1).concat("0000").concat(dato3).concat("\n");
+               codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
+               codedFile.write(codedInstruction);
+            }
+            if (instruction[0].equals("j"))
+            {
+               arrayNops = shiftArray(arrayNops, 17);
+               String dato1 = agregarCeros(Integer.toBinaryString(tags.get(instruction[1])),7);
+               codedInstruction = codedInstruction.concat("0111").concat("00000000").concat(dato1).concat("\n");
+               codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("addi"))
             {
@@ -270,25 +387,50 @@ public class PipelineCompiler {
                String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
                int cantidadNops = contarNops(arrayNops, int2, 16);
                codedInstruction = agregarNops(cantidadNops);
-               if ("".equals(codedInstruction))
-               {
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               else
-               {
-                   arrayNops = new int[]{17,17,17};
-                   arrayNops = shiftArray(arrayNops, int1);
-               }
-               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
-               codedFile.write(codedInstruction);
                if (cantidadNops != 0)
                {
-                    contadorLineas = contadorLineas + cantidadNops;
-                    tags = modificarTags(tags, contadorLineas, cantidadNops);
+                   arrayNops = new int[]{17,17,17};
                }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
             }
-            
-            contadorLineas++;
+            if (instruction[0].equals("sll"))
+            {
+               int int1 = Integer.parseInt(instruction[1]);
+               int int2 = Integer.parseInt(instruction[2]);
+               int int3 = Integer.parseInt(instruction[3]);
+               String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
+               String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
+               String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
+               int cantidadNops = contarNops(arrayNops, int2, 16);
+               codedInstruction = agregarNops(cantidadNops);
+               if (cantidadNops != 0)
+               {
+                   arrayNops = new int[]{17,17,17};
+               }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("1001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
+            }
+            if (instruction[0].equals("div"))
+            {
+               int int1 = Integer.parseInt(instruction[1]);
+               int int2 = Integer.parseInt(instruction[2]);
+               int int3 = Integer.parseInt(instruction[3]);
+               String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
+               String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
+               String dato3 = agregarCeros(Integer.toBinaryString(int3),4);
+               int cantidadNops = contarNops(arrayNops, int2, 16);
+               codedInstruction = agregarNops(cantidadNops);
+               if (cantidadNops != 0)
+               {
+                   arrayNops = new int[]{17,17,17};
+               }
+               arrayNops = shiftArray(arrayNops, int1);
+               codedInstruction = codedInstruction.concat("1011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedFile.write(codedInstruction);
+            }
         }
         codedFile.close();
    } 
