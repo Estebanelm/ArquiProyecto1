@@ -31,18 +31,6 @@ public class PipelineCompiler {
         return dato;
     }
     
-    private static Map<String, Integer> modificarTags(Map<String, Integer> tags, int lineaActual, int numNops)
-    {
-        for (String key : tags.keySet()) {
-            if (tags.get(key) > lineaActual)
-            {
-                tags.replace(key, tags.get(key) + numNops);
-        
-            }
-        }
-        return tags;
-    }
-    
     private static String agregarNops(int cantidadNops)
     {
         String stringConNops = "";
@@ -111,7 +99,8 @@ public class PipelineCompiler {
     {
         String[] instruction = line.split(" ");
         int cantidadNops = 0;
-        if (instruction[0].equals("lb"))
+        String codigo = instruction[0];
+        if (codigo.equals("lb") || codigo.equals("add") || codigo.equals("sub") || codigo.equals("mul"))
         {
             int int1 = Integer.parseInt(instruction[1]);
             int int2 = Integer.parseInt(instruction[2]);
@@ -123,48 +112,12 @@ public class PipelineCompiler {
             }
             array = shiftArray(array, int1);
         }
-        if (instruction[0].equals("li"))
+        if (codigo.equals("li"))
         {
            int int1 = Integer.parseInt(instruction[1]);
            array = shiftArray(array, int1);
         }
-        if (instruction[0].equals("add"))
-        {
-           int int1 = Integer.parseInt(instruction[1]);
-           int int2 = Integer.parseInt(instruction[2]);
-           int int3 = Integer.parseInt(instruction[3]);
-           cantidadNops = contarNops(array, int2, int3);
-           if (cantidadNops != 0)
-            {
-                array = new int[]{17,17,17};
-            }
-            array = shiftArray(array, int1);
-        }
-        if (instruction[0].equals("sub"))
-        {
-           int int1 = Integer.parseInt(instruction[1]);
-           int int2 = Integer.parseInt(instruction[2]);
-           int int3 = Integer.parseInt(instruction[3]);
-           cantidadNops = contarNops(array, int2, int3);
-           if (cantidadNops != 0)
-            {
-                array = new int[]{17,17,17};
-            }
-            array = shiftArray(array, int1);
-        }
-        if (instruction[0].equals("mul"))
-        {
-           int int1 = Integer.parseInt(instruction[1]);
-           int int2 = Integer.parseInt(instruction[2]);
-           int int3 = Integer.parseInt(instruction[3]);
-           cantidadNops = contarNops(array, int2, int3);
-           if (cantidadNops != 0)
-            {
-                array = new int[]{17,17,17};
-            }
-            array = shiftArray(array, int1);
-        }
-        if (instruction[0].equals("bne"))
+        if (codigo.equals("bne"))
         {
            int int1 = Integer.parseInt(instruction[1]);
            int int2 = Integer.parseInt(instruction[2]);
@@ -172,42 +125,18 @@ public class PipelineCompiler {
            cantidadNops += 3;
            array = new int[]{17,17,17};
         }
-        if (instruction[0].equals("beqz"))
+        if (codigo.equals("beqz"))
         {
            int int1 = Integer.parseInt(instruction[1]);
            cantidadNops = contarNops(array, int1, 16);
            cantidadNops += 3;
            array = new int[]{17,17,17};
         }
-        if (instruction[0].equals("j"))
+        if (codigo.equals("j"))
         {
-            array = shiftArray(array, 17);
+           array = shiftArray(array, 17);
         }
-        if (instruction[0].equals("addi"))
-        {
-           int int1 = Integer.parseInt(instruction[1]);
-           int int2 = Integer.parseInt(instruction[2]);
-           int int3 = Integer.parseInt(instruction[3]);
-           cantidadNops = contarNops(array, int2, 16);
-           if (cantidadNops != 0)
-            {
-                array = new int[]{17,17,17};
-            }
-            array = shiftArray(array, int1);
-        }
-        if (instruction[0].equals("sll"))
-        {
-           int int1 = Integer.parseInt(instruction[1]);
-           int int2 = Integer.parseInt(instruction[2]);
-           int int3 = Integer.parseInt(instruction[3]);
-           cantidadNops = contarNops(array, int2, 16);
-           if (cantidadNops != 0)
-            {
-                array = new int[]{17,17,17};
-            }
-            array = shiftArray(array, int1);
-        }
-        if (instruction[0].equals("div"))
+        if (codigo.equals("addi") || codigo.equals("sll") || codigo.equals("div"))
         {
            int int1 = Integer.parseInt(instruction[1]);
            int int2 = Integer.parseInt(instruction[2]);
