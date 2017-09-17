@@ -222,7 +222,7 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("0101").concat(dato1).concat(dato2).concat("0000000\n");
+               codedInstruction = codedInstruction.concat("0101").concat(dato1).concat(dato2).concat("1100000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("addr"))
