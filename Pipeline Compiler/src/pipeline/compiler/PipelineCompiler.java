@@ -155,9 +155,9 @@ public class PipelineCompiler {
 
         int[] arrayNops = new int[]{17,17,17};
 
-        String fileString = "C:\\Users\\Pelo\\Google Drive\\2017 Semestre 2\\Arquitectura de Computadoras 1\\Proyectos\\Repositorio Proyecto 1\\Pipeline Compiler\\Ejemplos\\assembly.asm";
+        String fileString = "C:\\Users\\Pelo\\codigo.asm";
         FileReader file = new FileReader(fileString);
-        String codeString = "C:\\Users\\Pelo\\Google Drive\\2017 Semestre 2\\Arquitectura de Computadoras 1\\Proyectos\\Repositorio Proyecto 1\\Pipeline Compiler\\Ejemplos\\code.mcn";
+        String codeString = "C:\\Users\\Pelo\\salida.mcn";
         FileWriter codedFile = new FileWriter(codeString);
         BufferedReader br1 = new BufferedReader(file);
         String line = null;
@@ -373,7 +373,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato3).concat(dato2).concat("000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("sllr"))
@@ -427,7 +427,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1011").concat(dato1).concat(dato3).concat(dato2).concat("000\n");
                codedFile.write(codedInstruction);
             }
         }
