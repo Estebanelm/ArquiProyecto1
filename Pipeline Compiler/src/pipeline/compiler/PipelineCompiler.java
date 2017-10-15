@@ -155,7 +155,7 @@ public class PipelineCompiler {
 
         int[] arrayNops = new int[]{17,17,17};
 
-        String fileString = args[1];
+        String fileString = args[0];
         FileReader file = new FileReader(fileString);
         String codeString = "salida.mcn";
         FileWriter codedFile = new FileWriter(codeString);
