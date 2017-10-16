@@ -1,0 +1,75 @@
+0: Iterador del hash del patron
+1: Puntero de la letra actual
+2: Potencias de 2.
+3: Hash del patron.
+4: Conteo.
+5: Hash del texto actual.
+6: contador hasta 11 del hash inicial del texto
+7,8,9: Uso general
+
+10: bandera de terminacion.
+
+11: se guarda el puntero del primer caracter del texto que se va recorriendo
+
+12: 00000
+13: inicio
+14: texto
+15: match
+
+$s0 = t10
+$s1 = t11
+$s2 = t12
+$s3 = t13
+$s4 = t14
+$s5 = t15
+	
+	li $t0, 0
+	li $t1, 0
+	li $t2, 1
+	li $t3, 0
+	li $t4, 0
+	li $t5, 0
+	li $t6, 0 ##Este se va a usar para contar hasta 11 para el texto inicial
+  	li $t7, 0
+	li $t8, 0
+	lw $t9, inicio
+	li $s0, 0
+	la $s1, texto+0 ##inicio
+hashpatron:
+	lb $t7, match($t0)
+	mul $t8, $t7, $t2
+	add $t3, $t3, $t8
+	sll $t2, $t2, 1
+	addi $t0, $t0, 1
+	bne $t0, 11, hashpatron
+	li $t2, 1
+hashinicialtexto:
+	lb $t7, texto($t1) ##$t9 es inicio, cambiar por lbm 7 14 13
+	mul $t8, $t7, $t2
+	add $t5, $t5, $t8
+	sll $t2, $t2, 1
+	addi $t1, $t1, 1
+	addi $t6, $t6, 1
+	bne $t6, 11, hashinicialtexto
+	srl $t2, $t2, 1
+iteraciongeneral:
+	beq $t3, $t5, matched2
+calcularnuevohash:
+	lb $t8, texto($t1) ##cargo el nuevo caracter
+	addi $t1, $t1, 1
+	beqz $t8, end
+	lb $t7, ($s1) ##cargar el primer caracter
+	addi $s1, $s1, 1
+	sub $t5, $t5, $t7 ##resto el hash anterior
+	div $t5, $t5, 2 ##divido entre 2
+	mul $t9, $t8, $t2 ##multiplico el nuevo caracter por la potencia de 2
+	add $t5, $t5, $t9 ##agrego el nuevo hash
+	j iteraciongeneral
+matched2:
+	addi $t4, $t4, 1
+	j calcularnuevohash
+end:
+	li $s0, 1
+	
+	
+	
