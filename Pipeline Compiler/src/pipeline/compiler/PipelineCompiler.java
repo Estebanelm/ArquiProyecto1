@@ -391,7 +391,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1001").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
+               codedInstruction = codedInstruction.concat("1001").concat(dato1).concat(dato3).concat(dato2).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("srlr"))
@@ -409,7 +409,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1110").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
+               codedInstruction = codedInstruction.concat("1110").concat(dato1).concat(dato3).concat(dato2).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("divri"))
