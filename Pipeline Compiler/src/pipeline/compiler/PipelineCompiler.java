@@ -36,7 +36,7 @@ public class PipelineCompiler {
         String stringConNops = "";
         for (int i = 0; i < cantidadNops; i++) 
         {
-            stringConNops = stringConNops.concat("0000000000000000000\n");
+            stringConNops = stringConNops.concat("00000000000000000000\n");
         }
         return stringConNops;
     }
@@ -132,7 +132,7 @@ public class PipelineCompiler {
            cantidadNops += 3;
            array = new int[]{17,17,17};
         }
-        if (codigo.equals("jump") || codigo.equals("nop"))
+        if (codigo.equals("nop") || codigo.equals("jump"))
         {
            array = shiftArray(array, 17);
         }
@@ -168,7 +168,7 @@ public class PipelineCompiler {
         int[] arrayCiclo1 = new int[]{17,17,17};
         while ((line = br1.readLine()) != null)
         {
-            String pattern = "[a-zA-Z]+:";
+            String pattern = "[a-zA-Z0-9]+:";
             Pattern r = Pattern.compile(pattern);
             Matcher m = r.matcher(line);
             if (m.find())
@@ -194,7 +194,7 @@ public class PipelineCompiler {
             if (instruction[0].equals("nop"))
             {
                arrayNops = shiftArray(arrayNops, 17);
-               codedInstruction = codedInstruction.concat("0000000000000000000\n");
+               codedInstruction = codedInstruction.concat("00000000000000000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("lbm"))
@@ -212,7 +212,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1000").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1000").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("lim"))
@@ -222,7 +222,7 @@ public class PipelineCompiler {
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("0101").concat(dato1).concat(dato2).concat("1100000\n");
+               codedInstruction = codedInstruction.concat("0101").concat(dato1).concat(dato2).concat("11000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("addr"))
@@ -240,7 +240,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("0001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("0001").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("andr"))
@@ -258,7 +258,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1111").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1111").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("subr"))
@@ -276,7 +276,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("0010").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("0010").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("mulr"))
@@ -294,7 +294,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("0011").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("0011").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("bner"))
@@ -306,9 +306,9 @@ public class PipelineCompiler {
                arrayNops = new int[]{17,17,17};
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
-               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),7);
+               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),8);
                codedInstruction = codedInstruction.concat("0100").concat(dato1).concat(dato2).concat(dato3).concat("\n");
-               codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
+               codedInstruction = codedInstruction.concat("00000000000000000000\n00000000000000000000\n00000000000000000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("beqr"))
@@ -320,9 +320,9 @@ public class PipelineCompiler {
                arrayNops = new int[]{17,17,17};
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2),4);
-               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),7);
+               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),8);
                codedInstruction = codedInstruction.concat("1100").concat(dato1).concat(dato2).concat(dato3).concat("\n");
-               codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
+               codedInstruction = codedInstruction.concat("00000000000000000000\n00000000000000000000\n00000000000000000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("beqzero"))
@@ -332,9 +332,9 @@ public class PipelineCompiler {
                codedInstruction = agregarNops(cantidadNops);
                arrayNops = new int[]{17,17,17};
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
-               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[2])),7);
+               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[2])),8);
                codedInstruction = codedInstruction.concat("0110").concat(dato1).concat("0000").concat(dato3).concat("\n");
-               codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
+               codedInstruction = codedInstruction.concat("00000000000000000000\n00000000000000000000\n00000000000000000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("beqi"))
@@ -346,15 +346,15 @@ public class PipelineCompiler {
                arrayNops = new int[]{17,17,17};
                String dato1 = agregarCeros(Integer.toBinaryString(int1),4);
                String dato2 = agregarCeros(Integer.toBinaryString(int2), 4);
-               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[2])),7);
+               String dato3 = agregarCeros(Integer.toBinaryString(tags.get(instruction[3])),8);
                codedInstruction = codedInstruction.concat("1101").concat(dato1).concat(dato2).concat(dato3).concat("\n");
-               codedInstruction = codedInstruction.concat("0000000000000000000\n0000000000000000000\n0000000000000000000\n");
+               codedInstruction = codedInstruction.concat("00000000000000000000\n00000000000000000000\n00000000000000000000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("jump"))
             {
                arrayNops = shiftArray(arrayNops, 17);
-               String dato1 = agregarCeros(Integer.toBinaryString(tags.get(instruction[1])),7);
+               String dato1 = agregarCeros(Integer.toBinaryString(tags.get(instruction[1])),8);
                codedInstruction = codedInstruction.concat("0111").concat("00000000").concat(dato1).concat("\n");
                codedFile.write(codedInstruction);
             }
@@ -373,7 +373,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato3).concat(dato2).concat("000\n");
+               codedInstruction = codedInstruction.concat("1010").concat(dato1).concat(dato3).concat(dato2).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("sllr"))
@@ -391,7 +391,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1001").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1001").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("srlr"))
@@ -409,7 +409,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1110").concat(dato1).concat(dato2).concat(dato3).concat("000\n");
+               codedInstruction = codedInstruction.concat("1110").concat(dato1).concat(dato2).concat(dato3).concat("0000\n");
                codedFile.write(codedInstruction);
             }
             if (instruction[0].equals("divri"))
@@ -427,7 +427,7 @@ public class PipelineCompiler {
                    arrayNops = new int[]{17,17,17};
                }
                arrayNops = shiftArray(arrayNops, int1);
-               codedInstruction = codedInstruction.concat("1011").concat(dato1).concat(dato3).concat(dato2).concat("000\n");
+               codedInstruction = codedInstruction.concat("1011").concat(dato1).concat(dato3).concat(dato2).concat("0000\n");
                codedFile.write(codedInstruction);
             }
         }
